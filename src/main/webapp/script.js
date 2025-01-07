@@ -13,6 +13,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.forEach(todo => {
                     const li = document.createElement("li");
                     li.textContent = `${todo.title} - [${todo.completed ? "Completed" : "Pending"}]`;
+					li.dataset.id = todo.id; // Store the ID in the list item
+
+						  // Create a button for marking as completed
+						  if (!todo.completed) {
+						    const completeButton = document.createElement("button");
+						    completeButton.textContent = "Mark as Completed";
+						    completeButton.addEventListener("click", () => markAsCompleted(todo.id));
+						    li.appendChild(completeButton);
+						  }
 
                     todoList.appendChild(li);
                 });
@@ -20,6 +29,23 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(error => console.error("Error fetching todos:", error));
     }
 
+	// Function to mark a todo as completed
+	function markAsCompleted(id) {
+	  fetch(`${baseUrl}/todos?id=${id}`, {
+	    method: "PUT",
+	    headers: {
+	      "Content-Type": "application/x-www-form-urlencoded",
+	    }
+	  })
+	  .then(response => response.json())
+	  .then(data => {
+	    console.log(data.message);
+	    fetchTodos(); // Refresh the list of todos
+	  })
+	  .catch(error => console.error("Error updating todo:", error));
+	}
+
+		
     // Event listener for form submission
     todoForm.addEventListener("submit", (event) => {
         event.preventDefault(); // Prevent form submission
